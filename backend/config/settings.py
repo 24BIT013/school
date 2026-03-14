@@ -1,5 +1,4 @@
 import os
-import dj_database_url
 from pathlib import Path
 from datetime import timedelta
 
@@ -67,13 +66,27 @@ ASGI_APPLICATION = 'config.asgi.application'
 # Database configuration
 DATABASE_URL = os.environ.get('DATABASE_URL')
 if DATABASE_URL:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
+    try:
+        import dj_database_url
+        DATABASES = {
+            'default': dj_database_url.config(
+                default=DATABASE_URL,
+                conn_max_age=600,
+                conn_health_checks=True,
+            )
+        }
+    except ImportError:
+        # Fallback if dj_database_url is not installed
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': DATABASE_URL.split('/')[-1],
+                'USER': DATABASE_URL.split('//')[1].split(':')[0],
+                'PASSWORD': DATABASE_URL.split(':')[2].split('@')[0],
+                'HOST': DATABASE_URL.split('@')[1].split(':')[0],
+                'PORT': DATABASE_URL.split(':')[-1].split('/')[0],
+            }
+        }
 else:
     DATABASES = {
         'default': {
