@@ -1,15 +1,29 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Build the frontend
+# Always run relative to the repo root so it works on Render and locally
+ROOT_DIR="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "Building frontend..."
-cd frontend
+pushd "${ROOT_DIR}/frontend" >/dev/null
 npm install
 npm run build
+popd >/dev/null
 
-# Copy built files to backend static directory
-echo "Copying frontend build to backend..."
-mkdir -p ../backend/staticfiles
-cp -r dist/* ../backend/staticfiles/
+echo "Copying frontend build to backend/staticfiles..."
+mkdir -p "${ROOT_DIR}/backend/staticfiles"
+cp -r "${ROOT_DIR}/frontend/dist/"* "${ROOT_DIR}/backend/staticfiles/"
 
-echo "Build complete!"</content>
-<parameter name="filePath">c:/Users/Administrator/OneDrive/Desktop/systemschool/build.sh
+echo "Installing backend dependencies..."
+pushd "${ROOT_DIR}/backend" >/dev/null
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+
+echo "Collecting static files..."
+python manage.py collectstatic --noinput --clear
+
+echo "Running migrations..."
+python manage.py migrate --noinput
+popd >/dev/null
+
+echo "Build complete!"

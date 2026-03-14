@@ -3,22 +3,7 @@ services:
   - type: web
     name: school-app
     runtime: python3
-    buildCommand: |
-      echo "Building frontend..." &&
-      cd frontend &&
-      npm install &&
-      npm run build &&
-      echo "Copying frontend to backend..." &&
-      cd .. &&
-      mkdir -p backend/staticfiles &&
-      cp -r frontend/dist/* backend/staticfiles/ &&
-      echo "Installing Python dependencies..." &&
-      cd backend &&
-      pip install -r requirements.txt &&
-      echo "Collecting static files..." &&
-      python manage.py collectstatic --noinput --clear &&
-      echo "Running migrations..." &&
-      python manage.py migrate --noinput
+    buildCommand: "bash build.sh"
     startCommand: "cd backend && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DEBUG
@@ -39,5 +24,4 @@ databases:
   - name: school-db
     databaseName: school_db
     user: school_user
-    plan: starter</content>
-<parameter name="filePath">c:/Users/Administrator/OneDrive/Desktop/systemschool/render.yaml
+    plan: starter
