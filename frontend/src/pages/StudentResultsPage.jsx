@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { myResults, downloadResults } from "../api/results";
+import { myResults, downloadResults, downloadResultsPdf } from "../api/results";
 
 const StudentResultsPage = () => {
   const [results, setResults] = useState([]);
@@ -28,10 +28,30 @@ const StudentResultsPage = () => {
     }
   };
 
+  const handleDownloadPdf = async () => {
+    setMessage("");
+    try {
+      const blob = await downloadResultsPdf();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "results.pdf";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch {
+      setMessage("Failed to download results PDF");
+    }
+  };
+
   return (
     <section className="card">
       <h3>Published Results</h3>
-      <button onClick={handleDownload}>Download Results CSV</button>
+      <div style={{ marginBottom: '1rem' }}>
+        <button onClick={handleDownload} style={{ marginRight: '0.5rem' }}>Download Results CSV</button>
+        <button onClick={handleDownloadPdf}>Download Results PDF</button>
+      </div>
       {message && <p className="info">{message}</p>}
       <table>
         <thead>

@@ -6,6 +6,7 @@ from .views import (
     StudentResultListView,
     StudentGPAView,
     StudentResultDownloadView,
+    StudentResultPdfDownloadView,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('me/', StudentResultListView.as_view(), name='student-results'),
     path('me/gpa/', StudentGPAView.as_view(), name='student-gpa'),
     path('me/download/', StudentResultDownloadView.as_view(), name='student-results-download'),
+    path('me/download/pdf/', StudentResultPdfDownloadView.as_view(), name='student-results-pdf-download'),
 ]
