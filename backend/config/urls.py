@@ -1,6 +1,7 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.contrib import admin
 from django.http import JsonResponse
+from django.views.generic import TemplateView
 
 
 def home(request):
@@ -53,4 +54,6 @@ urlpatterns = [
     path('api/auth/', include('accounts.urls')),
     path('api/courses/', include('courses.urls')),
     path('api/results/', include('results.urls')),
+    # Serve React app for all other routes
+    re_path(r'^(?!api/|admin/|static/).*', TemplateView.as_view(template_name='index.html'), name='react-app'),
 ]

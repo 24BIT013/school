@@ -1,0 +1,31 @@
+services:
+  # Django Backend with React Frontend served as static files
+  - type: web
+    name: school-app
+    runtime: python3
+    buildCommand: |
+      ./build.sh &&
+      cd backend &&
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --noinput --clear &&
+      python manage.py migrate --noinput
+    startCommand: "cd backend && gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: school-db
+          property: connectionString
+      - key: PYTHON_VERSION
+        value: 3.11
+
+# PostgreSQL Database
+databases:
+  - name: school-db
+    databaseName: school_db
+    user: school_user
+    plan: starter</content>
+<parameter name="filePath">c:/Users/Administrator/OneDrive/Desktop/systemschool/render.yaml
