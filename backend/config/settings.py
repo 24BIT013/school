@@ -1,6 +1,7 @@
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlparse
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -11,10 +12,14 @@ SECRET_KEY = os.getenv(
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
-# Add Render's host if available
+# Add Render's host if available (normalize to host without scheme)
 RENDER_EXTERNAL_URL = os.environ.get('RENDER_EXTERNAL_URL')
+render_host = None
 if RENDER_EXTERNAL_URL:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_URL)
+    parsed = urlparse(RENDER_EXTERNAL_URL)
+    render_host = parsed.netloc or parsed.path  # path covers scheme-less URLs
+    if render_host:
+        ALLOWED_HOSTS.append(render_host)
 
 try:
     import whitenoise  # noqa: F401
@@ -129,8 +134,9 @@ AUTH_USER_MODEL = 'accounts.User'
 
 # CORS configuration
 CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173').split(',')
-if RENDER_EXTERNAL_URL:
-    CORS_ALLOWED_ORIGINS.append(f"https://{RENDER_EXTERNAL_URL}")
+if render_host:
+    render_scheme = urlparse(RENDER_EXTERNAL_URL).scheme or 'https'
+    CORS_ALLOWED_ORIGINS.append(f"{render_scheme}://{render_host}")
 
 CORS_ALLOW_CREDENTIALS = True
 
