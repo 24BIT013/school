@@ -15,7 +15,7 @@ services:
           name: school-db
           property: connectionString
       - key: PYTHON_VERSION
-        value: 3.11
+        value: 3.11.9
       - key: DISABLE_POETRY
         value: true
 
